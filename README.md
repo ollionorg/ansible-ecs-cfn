@@ -58,7 +58,7 @@ This section gives information about the application which helps in naming the s
 
 - **`ecs.instance_type`** : The instance type to use for the cluster, for e.g. `t2.medium`
 - **`ecs.key_pair`** : The keypair name to be passed for cluster instances that are being created.
-- **`ecs.security_group`** : The security group of the ECS instance. Should allow traffic from the load balancer on ports 30000 to 60000.
+- **`ecs.security_group`** : The security group of the ECS instance. Should allow traffic from the load balancer on ports 30000 to 60000. Optional. It is optional. If you do not specify this field, a security group will be created for you.
 - **`ecs.cluster_size`** : The cluster size of the ECS Cluster.
 - **`ecs.subnets`** : A comma separated list of the subnets to be used for creating instances of the cluster.
 - **`ecs.cluster_name`** : The cluster name.
