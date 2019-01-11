@@ -1,0 +1,17 @@
+  application_name: 
+  aws_region: 
+  env : 
+  vpc_id: 
+  # role_arn: 
+  ecs:
+    instance_type: 
+    key_pair: 
+    #securityGroup: 
+    cluster_size: 
+    subnets: 
+    cluster_name: "{{ env }}-{{ application_name }}-cluster"
+    #clusterName: "{{ env }}-cluster"
+    instance_name_tag: "{{ env }}-{{ application_name }}-ecs-instance" 
+  alb:
+    subnets: 
+    #securityGroup: 
