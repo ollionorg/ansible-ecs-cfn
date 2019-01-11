@@ -10,6 +10,8 @@
 [Variables](#Variables)
 [License](#License)
 [Contributions](#Contributions)
+[Author Information](#Author%20Information)
+
 
 
 
@@ -79,4 +81,8 @@ MIT
 Everybody is welcome to contribute. Please, see [`contributing`][contrib] for further information.
 
 [contrib]: CONTRIBUTING.md
+
+## Author Information
+
+sagar.gulabani@cldcvr.com
 
