@@ -1,7 +1,7 @@
 Contributing to ECS-Ansible
 =======================
 
-The easiest ways to contribute to `ECS-Ansible` are:
+The easiest ways to contribute to `ansible-ecs-cfn` are:
 
 
   * Creating a new [issue].
