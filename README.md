@@ -7,7 +7,8 @@
 
 [Prerequisites](#prerequisites)  
 [How To Run](#How%20To%20Run)  
-[Variables](#Variables)  
+[Variables](#Variables)
+[License](#License)
 [Contributions](#Contributions)
 
 
@@ -68,6 +69,10 @@ This section gives information about the application which helps in naming the s
 
 - **`alb.subnets`** : The subnets containing a load balancer node. Should be public subnets and should belong to atleast two different availability zones
 - **`alb.security_group`** : The security group of the load balancer. This load balancer allows traffic from the public on port 80 and port 443. It is optional. If you do not specify this field, a security group will be created for you.
+
+## License
+
+MIT
 
 ## Contributions
 
