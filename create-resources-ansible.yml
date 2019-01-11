@@ -1,0 +1,19 @@
+---
+- name: Create AWS Resources Ansible
+  hosts: localhost
+
+  vars_files:
+    - "configs/{{ config_file | default('config.yml') }}"
+
+    - name: Get assumed role for AWS
+      sts_assume_role: 
+        role_arn: "{{ role_arn }}"
+        role_session_name: deploy_infra_{{env}}
+      register: assumed_role
+      when: role_arn is defined and role_arn != ""
+
+  roles:
+    - create-load-balancer
+    - create-ecs-cluster
+    - create-ecr
+  

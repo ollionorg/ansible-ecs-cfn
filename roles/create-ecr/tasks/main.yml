@@ -1,0 +1,12 @@
+- name: create ecr
+  cloudformation:
+    stack_name: "{{ application_name }}-ecr-stack"
+    state: present
+    region: "{{ aws_region }}"
+    template: "{{ ecr_cfn_template }}"
+    template_parameters:
+      ApplicationName : "{{ application_name }}"
+  environment:
+    AWS_ACCESS_KEY_ID: "{{  assumed_role.sts_creds.access_key }}"
+    AWS_SECRET_ACCESS_KEY: "{{ assumed_role.sts_creds.secret_key }}"
+    AWS_SESSION_TOKEN: "{{ assumed_role.sts_creds.session_token }}"

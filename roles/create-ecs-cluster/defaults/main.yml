@@ -1,0 +1,6 @@
+---
+# defaults file for roles/ecs-cluster
+
+instance_type: t2.micro
+cluster_size: 2
+ecs_cfn_template: "{{ role_path }}/templates/ecs-cluster-cfn.yml"

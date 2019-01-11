@@ -1,0 +1,17 @@
+  application_name: test-application
+  aws_region: us-east-1
+  env : staging/prod 
+  role_arn: 
+  vpc_id: vpc-12345678
+  ecs:
+    instance_type: t2.small
+    key_pair: your-key-pair
+    security_group: sg-123456789012345
+    cluster_size: 2
+    subnets: subnet-12345678,subnet-12345678,subnet-12345678
+    cluster_name: "{{ env }}-{{ application_name }}-cluster"
+    #clusterName: "{{ env }}-cluster"
+    instance_name_tag: "{{ env }}-{{ application_name }}-ecs-instance" 
+  alb:
+    subnets: subnet-12345678,subnet-12345678,subnet-12345678
+    security_group: sg-123456789012345

@@ -1,0 +1,15 @@
+galaxy_info:
+  author: Sagar Gulabani
+  description: An Ansible role to create a load balancer using cloudformation stacks.
+  company: Cloudcover
+
+  license: MIT
+
+  min_ansible_version: 2.2
+
+  galaxy_tags:
+    - aws
+    - cloudformation
+    - loadbalancer
+
+dependencies: []

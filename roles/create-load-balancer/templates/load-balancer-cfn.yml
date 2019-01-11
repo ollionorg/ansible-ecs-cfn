@@ -1,0 +1,84 @@
+Description: Create an Application Load balancer
+Parameters:
+  ApplicationName:
+    Description: Application Name
+    Type: String
+  Environment:
+    Description: The environment
+    Type: String
+  Subnets:
+    Description: The list of subnets.
+    Type: List<AWS::EC2::Subnet::Id>
+  VpcId:
+    Type: 'AWS::EC2::VPC::Id'
+    Description: Which VPC should the application be deployed to.
+  SecurityGroup:
+    Default: ''
+    Type: 'String'
+    Description: Security group for the load balancer. A scurity group that allows HTTP and HTTPS traffic to the load balancer. 
+Conditions:
+  CreateSecurityGroup : !Equals [ !Ref SecurityGroup, '' ] 
+Resources:
+  LoadBalancerSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Condition: CreateSecurityGroup
+    Properties:
+      GroupName: !Sub ${Environment}-${ApplicationName}-Load-Balancer-Security-Group
+      GroupDescription: Security group to allow inbound traffic for ecs instances
+      VpcId: !Ref VpcId
+      SecurityGroupIngress: 
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+
+  LoadBalancer:
+    Type: 'AWS::ElasticLoadBalancingV2::LoadBalancer'
+    Properties:
+      Name: !Sub ${Environment}-${ApplicationName}-ALB
+      Subnets: !Ref Subnets
+      Scheme: internet-facing
+      SecurityGroups:
+        - !If [CreateSecurityGroup, !Ref LoadBalancerSecurityGroup, !Ref SecurityGroup]
+      IpAddressType: ipv4
+
+  LoadBalancerListener:
+    Type: 'AWS::ElasticLoadBalancingV2::Listener'
+    Properties:
+      LoadBalancerArn: !Ref LoadBalancer
+      Port: 80
+      Protocol: HTTP
+      DefaultActions: 
+        - Type: forward
+          TargetGroupArn: !Ref DefaultTargetGroup
+
+  DefaultTargetGroup:
+    Type: 'AWS::ElasticLoadBalancingV2::TargetGroup'
+    Properties:
+      Name: !Sub ${Environment}-${ApplicationName}-TG
+      VpcId: !Ref VpcId
+      Port: 80
+      Protocol: HTTP
+
+Outputs:
+  ListenerARN:
+    Description: The ARN of the listener
+    Value: !Ref LoadBalancerListener
+  ALBARN:
+    Description: ARN of the ALB
+    Value: !Ref LoadBalancer
+  ALBDNSName: 
+    Description: DNS Name of the ALB
+    Value: !GetAtt LoadBalancer.DNSName
+  VPC:
+    Description: VPC Of Load balancer
+    Value: !Ref VpcId
+  TargetGroupARN:
+    Description: The ARN of the default target group
+    Value: !Ref DefaultTargetGroup
+  SecurityGroupId:
+    Description: The security group of the load balancer.
+    Value: !If [ CreateSecurityGroup, !Ref LoadBalancerSecurityGroup , !Ref SecurityGroup ]
+    Export: 
+      Name: 
+        !Sub ${AWS::StackName}-SecurityGroup 

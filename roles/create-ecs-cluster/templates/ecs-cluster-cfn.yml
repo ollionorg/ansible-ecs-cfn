@@ -1,0 +1,179 @@
+---
+Description: ECS Cluster
+Parameters:
+  ApplicationName:
+    Description: Application Name
+    Type: String
+  Environment:
+    Description: The environment
+    Type: String
+  InstanceType:
+    Description: Which instance type should we use to build the cluster ?
+    Type: String
+  KeyPair:
+    Description: The key pair of the instances.
+    Type: String
+  SecurityGroup:
+    Description: Select the security group to use. This security group should have all traffic open from the load balancer.
+    Type: 'String'
+    Default: ''
+  ClusterSize:
+    Description: Minimum cluster size
+    Type: String
+  Subnets:
+    Description: Subnets
+    Type: List<AWS::EC2::Subnet::Id>
+  ClusterName:
+    Description: The name of the cluster
+    Type: String
+  InstanceNameTag:
+    Description: Name Tag for EC2 Instance in autoscaling group
+    Type: String
+  VpcId:
+    Description: The VPC Id 
+    Type: AWS::EC2::VPC::Id
+Mappings:
+  AWSRegionToAMI:
+    us-east-2:
+      AMI: ami-0a0c6574ce16ce87a
+    us-east-1:
+      AMI: ami-07eb698ce660402d2
+    us-west-2:
+      AMI: ami-09568291a9d6c804c
+    us-west-1:
+      AMI: ami-04c22ba97a0c063c4
+    eu-west-3:
+      AMI: ami-0a0948de946510ec0
+    eu-west-2:
+      AMI: ami-0cb31bf24b130a0f9
+    eu-west-1:
+      AMI: ami-066826c6a40879d75
+    eu-central-1:
+      AMI: ami-0b9fee3a2d0596ed1
+    ap-northeast-2:
+      AMI: ami-0b52e57bed048ca48
+    ap-northeast-1:
+      AMI: ami-0edf19001c48838c7
+    ap-southeast-2:
+      AMI: ami-08c26730c8ee004fa
+    ap-southeast-1:
+      AMI: ami-08d4fe232c67b81b8
+    ca-central-1:
+      AMI: ami-055750f063052ec55
+    ap-south-1:
+      AMI: ami-05f009513cd58ac90
+    sa-east-1:
+      AMI: ami-0ada25501ac1375b3
+Conditions:
+  CreateSecurityGroup: !Equals [ !Ref SecurityGroup, '' ] 
+Resources:
+
+  ECSInstanceSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Condition: CreateSecurityGroup
+    Properties:
+      GroupName: 'ECS-Instance-Security-Group'
+      GroupDescription: Security group to allow inbound traffic for ecs instances
+      VpcId: !Ref VpcId
+      SecurityGroupIngress: 
+        - IpProtocol: TCP
+          FromPort: 31000
+          ToPort: 65535
+          SourceSecurityGroupId: 
+            Fn::ImportValue:
+              !Sub ${Environment}-${ApplicationName}-alb-stack-SecurityGroup
+  ServiceInstanceLaunchConfiguration:
+    Type: 'AWS::AutoScaling::LaunchConfiguration'
+    Properties: 
+      ImageId: !FindInMap
+        - AWSRegionToAMI
+        - !Ref 'AWS::Region'
+        - AMI
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyPair
+      SecurityGroups:
+        - !If [CreateSecurityGroup, !Ref ECSInstanceSecurityGroup, !Ref SecurityGroup]
+      IamInstanceProfile: !Ref ServiceInstanceEC2InstanceProfile
+      UserData: 
+        'Fn::Base64': !Sub |
+          #!/bin/bash
+          echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+
+  ECSCluster:
+    Type: 'AWS::ECS::Cluster'
+    Properties:
+      ClusterName: !Ref ClusterName
+
+  ServiceInstanceEC2InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+       - !Ref ServiceInstanceEC2Role
+
+  ServiceInstanceEC2Role:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: !Sub ${Environment}-${ApplicationName}-ServiceInstanceEC2Role
+      AssumeRolePolicyDocument: >
+        {
+            "Statement": [{
+                "Action": "sts:AssumeRole",
+                "Effect": "Allow",
+                "Principal": {
+                    "Service": "ec2.amazonaws.com"
+                }
+            }]
+        }
+      Policies:
+        - PolicyName: ecs-service
+          PolicyDocument: >
+            {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "ecs:CreateCluster",
+                    "ecs:DeregisterContainerInstance",
+                    "ecs:DiscoverPollEndpoint",
+                    "ecs:Poll",
+                    "ecs:RegisterContainerInstance",
+                    "ecs:StartTelemetrySession",
+                    "ecs:Submit*",
+                    "ecr:GetAuthorizationToken",
+                    "ecr:BatchCheckLayerAvailability",
+                    "ecr:GetDownloadUrlForLayer",
+                    "ecr:BatchGetImage",
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+  
+  ServiceInstanceEC2AutoscalingGroup:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      AutoScalingGroupName: !Sub ${Environment}-${ApplicationName}-autoscaling-group
+      VPCZoneIdentifier: !Ref Subnets
+      LaunchConfigurationName: !Ref ServiceInstanceLaunchConfiguration
+      MinSize: !Ref ClusterSize
+      MaxSize: !Ref ClusterSize
+      DesiredCapacity: !Ref ClusterSize
+      Tags:
+          - Key: Name
+            Value: !Ref InstanceNameTag
+            PropagateAtLaunch: true
+
+
+Outputs:
+  ECSClusterName:
+    Description: The name of the ECS Cluster
+    Value: !Ref ECSCluster
+    Export:
+      Name:
+        Fn::Sub: ${AWS::StackName}-ECSCluster
+  
+
+

@@ -1,0 +1,5 @@
+---
+# defaults file for roles/create-load-balancer
+
+loadbalancer_cfn_template: "{{ role_path }}/templates/load-balancer-cfn.yml"
+aws_region: us-east-1

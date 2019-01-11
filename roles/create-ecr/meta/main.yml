@@ -1,0 +1,17 @@
+galaxy_info:
+  author: Sagar Gulabani
+  description: A role to create an ECR using cloudformation stacks
+  company: Cloudcover
+
+
+  license: MIT
+
+  min_ansible_version: 1.2
+
+
+  galaxy_tags: 
+    - aws
+    - ecr
+    - cloudformation
+
+dependencies: []

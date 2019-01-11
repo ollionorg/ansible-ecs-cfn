@@ -1,0 +1,6 @@
+---
+# defaults file for roles/create-ecr
+ecr_cfn_template: "{{ role_path }}/templates/ecr-cfn.yml"
+application_name: test-application
+aws_region: us-east-1
+

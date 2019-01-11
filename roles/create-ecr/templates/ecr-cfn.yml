@@ -1,0 +1,15 @@
+Description: Application ECR repo stack
+Parameters:
+  ApplicationName:
+    Type: String
+    Description: Application Name
+Resources:
+  ECRRepository:
+    Type: 'AWS::ECR::Repository'
+    Properties:
+      RepositoryName: !Ref ApplicationName
+Outputs:
+  EcrURI:
+    Description: The uri of the ECR Repo
+    Value: !Sub >
+      ${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/${ApplicationName}
