@@ -7,7 +7,7 @@
 
 [Prerequisites](#prerequisites)  
 [How To Run](#How%20To%20Run)  
-[Variables](#Variables)
+[Variables](#Variables)  
 [License](#License)  
 [Contributions](#Contributions)  
 [Author Information](#Author%20Information). 
