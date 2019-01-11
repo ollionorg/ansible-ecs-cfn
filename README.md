@@ -6,11 +6,11 @@
 </p>
 
 [Prerequisites](#prerequisites)  
-[How To Run](#How%20To%20Run)  
+[How To Run](#How-To-Run)  
 [Variables](#Variables)  
 [License](#License)  
 [Contributions](#Contributions)  
-[Author Information](#Author%20Information). 
+[Author Information](#Author-Information). 
 
 
 
