@@ -5,6 +5,8 @@
   vars_files:
     - "configs/{{ config_file | default('config.yml') }}"
 
+
+  pre_tasks:
     - name: Get assumed role for AWS
       sts_assume_role: 
         role_arn: "{{ role_arn }}"
