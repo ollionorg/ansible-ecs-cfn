@@ -3,10 +3,9 @@
     stack_name: "{{ application_name }}-ecr-stack"
     state: present
     region: "{{ aws_region }}"
+    aws_access_key: "{{ assumed_role.sts_creds.access_key if role_arn is defined | default(false) else omit }}"
+    aws_secrey_key: "{{ assumed_role.sts_creds.secret_key if role_arn is defined | default(false) else omit }}"
+    security_token:  "{{ assumed_role.sts_creds.session_token if role_arn is defined | default(false) else omit }}"
     template: "{{ ecr_cfn_template }}"
     template_parameters:
       ApplicationName : "{{ application_name }}"
-  environment:
-    AWS_ACCESS_KEY_ID: "{{  assumed_role.sts_creds.access_key }}"
-    AWS_SECRET_ACCESS_KEY: "{{ assumed_role.sts_creds.secret_key }}"
-    AWS_SESSION_TOKEN: "{{ assumed_role.sts_creds.session_token }}"

@@ -9,19 +9,21 @@
 - debug:
     var: alb
 
+- debug:
+    var: assumed_role
+
 - name: create loadbalancer
   cloudformation:
     stack_name: "{{ env }}-{{ application_name }}-alb-stack"
     state: present
     region: "{{ aws_region }}"
     template: "{{ loadbalancer_cfn_template }}"
+    aws_access_key: "{{ assumed_role.sts_creds.access_key if role_arn is defined | default(false) else omit }}"
+    aws_secrey_key: "{{ assumed_role.sts_creds.secret_key if role_arn is defined | default(false) else omit }}"
+    security_token:  "{{ assumed_role.sts_creds.session_token if role_arn is defined | default(false) else omit }}" 
     template_parameters:
       ApplicationName : "{{ application_name }}"
       Environment: "{{ env }}"
       Subnets: "{{ alb.subnets }}"
       VpcId: "{{ vpc_id }}"
       SecurityGroup: "{{ alb.security_group | default('') }}"
-  environment:
-    AWS_ACCESS_KEY_ID: "{{  assumed_role.sts_creds.access_key }}"
-    AWS_SECRET_ACCESS_KEY: "{{ assumed_role.sts_creds.secret_key }}"
-    AWS_SESSION_TOKEN: "{{ assumed_role.sts_creds.session_token }}"      
